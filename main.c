@@ -4,19 +4,19 @@
 
 typedef struct {
   char nome[2];
-  int codigo;
+  int indice;
 } Estado;
 
 typedef struct {
   int estado_a;
   int estado_b;
-  int codigo;
+  int indice;
 } Rodovia;
 
 void carregar_estados();
 void carregar_rodovias();
-Estado novo_estado(char nome[], int codigo);
-Rodovia nova_rodovia(int estado_a, int estado_b, int codigo);
+Estado novo_estado(char nome[], int indice);
+Rodovia nova_rodovia(int estado_a, int estado_b, int indice);
 
 int main() {
   Estado estados[26];
@@ -41,19 +41,19 @@ int main() {
   return 0;
 }
 
-Estado novo_estado(char nome[], int codigo) {
+Estado novo_estado(char nome[], int indice) {
   Estado novo;
   char *pointer = novo.nome;
   strcpy(pointer, nome);
-  novo.codigo = codigo;
+  novo.indice = indice;
   return novo;
 }
 
-Rodovia nova_rodovia(int estado_a, int estado_b, int codigo) {
+Rodovia nova_rodovia(int estado_a, int estado_b, int indice) {
   Rodovia nova;
-  nova.estado_a = estado_a;
-  nova.estado_b = estado_b;
-  nova.codigo = codigo;
+  nova.estado_a = (estado_a > estado_b ? estado_b : estado_a);
+  nova.estado_b = (estado_b > estado_a ? estado_a : estado_b);
+  nova.indice = indice;
   return nova;
 }
 
