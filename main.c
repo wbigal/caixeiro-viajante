@@ -19,6 +19,7 @@ void carregar_estados();
 void carregar_rodovias();
 Estado novo_estado(char nome[], int indice);
 Rodovia nova_rodovia(int estado_a, int estado_b, int indice);
+void criar_matriz_adjacencias(int matriz[][]);
 
 int main() {
   Estado estados[NUM_ESTADOS];
@@ -57,6 +58,10 @@ Rodovia nova_rodovia(int estado_a, int estado_b, int indice) {
   nova.estado_b = (estado_b > estado_a ? estado_a : estado_b);
   nova.indice = indice;
   return nova;
+}
+
+void criar_matriz_adjacencias(int matriz[][]) {
+  
 }
 
 void carregar_estados(Estado estados[]) {
