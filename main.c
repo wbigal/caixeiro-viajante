@@ -3,6 +3,7 @@
 #include<stdlib.h>
 #define NUM_ESTADOS 26
 #define NUM_RODOVIAS 43
+#define NIL_VALUE -1
 
 typedef struct {
   char nome[2];
@@ -17,31 +18,54 @@ typedef struct {
 
 void carregar_estados();
 void carregar_rodovias();
+void iniciar_matriz_adjacencias(int matriz[NUM_ESTADOS][NUM_ESTADOS]);
+void exibir_matriz_adjacencias(int matriz[NUM_ESTADOS][NUM_ESTADOS], Estado estados[]);
+void encontrar_caminhos(Estado origem, int matriz_adjacencias[NUM_ESTADOS][NUM_ESTADOS], int vertices[NUM_ESTADOS]);
 Estado novo_estado(char nome[], int indice);
 Rodovia nova_rodovia(int estado_a, int estado_b, int indice);
-void criar_matriz_adjacencias(int matriz[][]);
 
 int main() {
   Estado estados[NUM_ESTADOS];
   Rodovia rodovias[NUM_RODOVIAS];
+  int matriz_adjacencias[NUM_ESTADOS][NUM_ESTADOS] = { NIL_VALUE, NIL_VALUE, -1 };
+
+  int i,j;
+
   carregar_estados(estados);
   carregar_rodovias(rodovias);
+  iniciar_matriz_adjacencias(matriz_adjacencias);
 
-  // int i;
-  //
-  // for (i = 0; i < NUM_ESTADOS; i++) {
-  //   printf("%s\n", estados[i].nome);
-  // }
-  //
-  // for (i = 0; i < 44; i++) {
-  //   printf("%s - %s - %d\n",
-  //     estados[rodovias[i].estado_a].nome,
-  //     estados[rodovias[i].estado_b].nome,
-  //     rodovias[i].codigo
-  //   );
-  // }
+  for (i = 0; i < NUM_RODOVIAS; i++) {
+    matriz_adjacencias[rodovias[i].estado_a][rodovias[i].estado_b] = rodovias[i].indice;
+    matriz_adjacencias[rodovias[i].estado_b][rodovias[i].estado_a] = rodovias[i].indice;
+  }
+
+  exibir_matriz_adjacencias(matriz_adjacencias, estados);
+
+  printf("\n");
+
+  int vertices[NUM_ESTADOS];
+
+  for (i = 0; i < NUM_ESTADOS; i++) vertices[i] = NIL_VALUE;
+
+  encontrar_caminhos(estados[24], matriz_adjacencias, vertices);
+
+  for (i = 0; i < NUM_ESTADOS && vertices[i] != NIL_VALUE; i++) {
+    printf("%s\n", estados[vertices[i]].nome);
+  }
 
   return 0;
+}
+
+void encontrar_caminhos(Estado origem, int matriz_adjacencias[NUM_ESTADOS][NUM_ESTADOS], int vertices[NUM_ESTADOS]) {
+  int i;
+  int j = 0;
+
+  for (i = 0; i < NUM_ESTADOS; i++) {
+    if (matriz_adjacencias[origem.indice][i] != NIL_VALUE) {
+      vertices[j++] = i;
+    }
+  }
 }
 
 Estado novo_estado(char nome[], int indice) {
@@ -55,13 +79,43 @@ Estado novo_estado(char nome[], int indice) {
 Rodovia nova_rodovia(int estado_a, int estado_b, int indice) {
   Rodovia nova;
   nova.estado_a = (estado_a > estado_b ? estado_b : estado_a);
-  nova.estado_b = (estado_b > estado_a ? estado_a : estado_b);
+  nova.estado_b = (estado_b > estado_a ? estado_b : estado_a);
   nova.indice = indice;
   return nova;
 }
 
-void criar_matriz_adjacencias(int matriz[][]) {
-  
+void iniciar_matriz_adjacencias(int matriz[NUM_ESTADOS][NUM_ESTADOS]) {
+  int i,j;
+
+  for (i = 0; i < NUM_ESTADOS; i++) {
+    for (j = 0; j < NUM_ESTADOS; j++) {
+      matriz[i][j] = NIL_VALUE;
+    }
+  }
+}
+
+void exibir_matriz_adjacencias(int matriz[NUM_ESTADOS][NUM_ESTADOS], Estado estados[]) {
+  int i,j;
+
+  printf("   |");
+
+  for (i = 0; i < NUM_ESTADOS; i++) {
+    printf("%s | ", estados[i].nome);
+  }
+
+  printf("\n");
+
+  for (i = 0; i < NUM_ESTADOS; i++) {
+    printf("%s |", estados[i].nome);
+    for (j = 0; j < NUM_ESTADOS; j++) {
+      if (i == j) {
+        printf(" - | ");
+      } else {
+        printf("%02d | ", matriz[i][j]);
+      }
+    }
+    printf("\n");
+  }
 }
 
 void carregar_estados(Estado estados[]) {
