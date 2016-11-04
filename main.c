@@ -1,6 +1,8 @@
 #include<stdio.h>
 #include<string.h>
 #include<stdlib.h>
+#define NUM_ESTADOS 26
+#define NUM_RODOVIAS 43
 
 typedef struct {
   char nome[2];
@@ -19,14 +21,14 @@ Estado novo_estado(char nome[], int indice);
 Rodovia nova_rodovia(int estado_a, int estado_b, int indice);
 
 int main() {
-  Estado estados[26];
-  Rodovia rodovias[43];
+  Estado estados[NUM_ESTADOS];
+  Rodovia rodovias[NUM_RODOVIAS];
   carregar_estados(estados);
   carregar_rodovias(rodovias);
 
   // int i;
   //
-  // for (i = 0; i < 26; i++) {
+  // for (i = 0; i < NUM_ESTADOS; i++) {
   //   printf("%s\n", estados[i].nome);
   // }
   //
