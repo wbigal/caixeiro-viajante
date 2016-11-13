@@ -31,6 +31,17 @@ void LiberaGrafo(TipoGrafo *grafo);
 void ImprimeGrafo(TipoGrafo *grafo);
 
 int main() {
+  Apontador aux;
+  int i;
+  TipoValorVertice v1, v2 adj;
+  TipoPeso peso;
+  TipoGrafo grafo, grafot;
+  TipoValorVertice nVertices;
+  int nArestas;
+  bool fimListaAdj;
+
+
+
   printf("%s :)\n", "PCV");
   return 0;
 }
