@@ -1,5 +1,6 @@
 #include<stdio.h>
 
+// Definições das constantes utilizadas para auxiliar as funções
 #define MAX_NUM_VERTICES  100
 #define MAX_NUM_ARESTAS   4500
 #define VAZIO             0
@@ -29,19 +30,10 @@ void ProxAdj(TipoValorVertice *vertice, TipoGrafo *grafo, TipoValorVertice *adj,
 void RetiraAresta(TipoValorVertice *v1, TipoValorVertice *v2, TipoPeso *peso, TipoGrafo *grafo);
 void LiberaGrafo(TipoGrafo *grafo);
 void ImprimeGrafo(TipoGrafo *grafo);
+void TestaGrafo();
 
 int main() {
-  Apontador aux;
-  int i;
-  TipoValorVertice v1, v2 adj;
-  TipoPeso peso;
-  TipoGrafo grafo, grafot;
-  TipoValorVertice nVertices;
-  int nArestas;
-  bool fimListaAdj;
-
-
-
+  TestaGrafo();
   printf("%s :)\n", "PCV");
   return 0;
 }
@@ -50,8 +42,8 @@ int main() {
 // Complexidade: O(n^2)
 void FGVazio(TipoGrafo *grafo) {
   int i, j;
-  for (i=0; i <= grafo->NumVertices; i++) {
-    for (j=0; j <= grafo->NumVertices; j++) {
+  for (i=0; i < grafo->NumVertices; i++) {
+    for (j=0; j < grafo->NumVertices; j++) {
       grafo->MatAdj[i][j] = VAZIO;
     }
   }
@@ -143,7 +135,7 @@ void LiberaGrafo(TipoGrafo *grafo) {
 void ImprimeGrafo(TipoGrafo *grafo) {
   int i, j;
 
-  printf(" ");
+  printf("    ");
 
   for (i=0; i < grafo->NumVertices; i++) {
     printf(" %3d", i);
@@ -153,9 +145,61 @@ void ImprimeGrafo(TipoGrafo *grafo) {
 
   for (i=0; i < grafo->NumVertices; i++) {
     printf(" %3d", i);
-    for (j=0; j <= grafo->NumVertices; j++) {
+    for (j=0; j < grafo->NumVertices; j++) {
       printf(" %3d", grafo->MatAdj[i][j]);
     }
+    printf("\n");
+  }
+}
+
+void TestaGrafo() {
+  Apontador aux;
+  int i;
+  TipoValorVertice v1, v2, adj;
+  TipoPeso peso;
+  TipoGrafo grafo, grafot;
+  TipoValorVertice nVertices;
+  int nArestas;
+  bool fimListaAdj;
+
+  printf("No. vertices: "); scanf("%d", &nVertices);
+  printf("No. arestas: "); scanf("%d", &nArestas);
+
+  grafo.NumVertices = nVertices;
+  grafo.NumArestas = VAZIO;
+  FGVazio(&grafo);
+
+  i = 0;
+  while(i < nArestas) {
+    printf("Insere V1--V2--Peso:");
+    scanf("%d %d %d", &v1, &v2, &peso);
+
+    if (ExisteAresta(v1, v2, &grafo)) {
+      printf("Aresta já existe\n");
+    } else {
+    grafo.NumArestas++;
+      // Insere nas duas direções por não se tratar de um grafo direcionado
+      InsereAresta(&v1, &v2, &peso, &grafo);
+      InsereAresta(&v2, &v1, &peso, &grafo);
+      i++;
+    }
+  }
+
+  ImprimeGrafo(&grafo);
+
+  printf("Lista adjacentes de: "); scanf("%d", &v1);
+
+  if (ListaAdjVazia(&v1, &grafo)) {
+    printf("Lista adjacente vazia");
+  } else {
+    aux = PrimeiroListaAdj(&v1, &grafo);
+    fimListaAdj = FALSE;
+
+    while (!fimListaAdj) {
+      ProxAdj(&v1, &grafo, &adj, &peso, &aux, &fimListaAdj);
+      printf(" %2d (%d)", adj, peso);
+    }
+
     printf("\n");
   }
 }
