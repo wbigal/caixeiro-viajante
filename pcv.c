@@ -227,6 +227,7 @@ void RegistraUltimoPasso(Caminho *caminho, TipoGrafo *grafo) {
     caminho->Passos[caminho->NumVertices - 1] = NIL_VALUE;
     printf("\n**** Nao existe aresta entre o primeiro e último vertices ****\n\n");
   }
+  caminho->TotalPassos++;
 }
 
 void ExibeCaminho(Caminho *caminho) {
