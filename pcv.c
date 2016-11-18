@@ -6,9 +6,16 @@
 #define VAZIO             0
 #define TRUE              1
 #define FALSE             0
+#define BRANCO            0
+#define CINZA             1
+#define PRETO             2
+#define NIL_VALUE         -1
 
 // Definições dos tipos para o Grafo
 typedef int TipoValorVertice;
+typedef int TipoValorAresta;
+typedef int TipoValorTempo;
+typedef int TipoCor;
 typedef int TipoPeso;
 typedef short bool;
 
@@ -17,6 +24,12 @@ typedef struct TipoGrafo {
   int NumVertices;
   int NumArestas;
 } TipoGrafo;
+
+typedef struct Caminho {
+  TipoValorVertice passos[MAX_NUM_VERTICES + 1];
+  int NumVertices;
+  int TotalPassos;
+} Caminho;
 
 typedef TipoValorVertice Apontador;
 
@@ -28,9 +41,13 @@ bool ListaAdjVazia(TipoValorVertice *vertice, TipoGrafo *grafo);
 Apontador PrimeiroListaAdj(TipoValorVertice *vertice, TipoGrafo *grafo);
 void ProxAdj(TipoValorVertice *vertice, TipoGrafo *grafo, TipoValorVertice *adj, TipoPeso *peso, Apontador *prox, bool *fimListaAdj);
 void RetiraAresta(TipoValorVertice *v1, TipoValorVertice *v2, TipoPeso *peso, TipoGrafo *grafo);
+void VisitaDsf(TipoValorVertice vertice, TipoGrafo *grafo, TipoValorTempo *tempo, TipoValorTempo *d, TipoValorTempo *t, TipoCor *cor, int *antecessor, Caminho *caminho);
+void BuscaEmProfundidade(TipoGrafo *grafo);
 void LiberaGrafo(TipoGrafo *grafo);
 void ImprimeGrafo(TipoGrafo *grafo);
 void TestaGrafo();
+
+void RegistraPasso(Caminho *caminho, TipoValorVertice v);
 
 int main() {
   TestaGrafo();
@@ -128,6 +145,82 @@ void RetiraAresta(TipoValorVertice *v1, TipoValorVertice *v2, TipoPeso *peso, Ti
   }
 }
 
+// Insere o indice do vertice no caminho a ser percorrido
+// Complexidade: Constante
+void RegistraPasso(Caminho *caminho, TipoValorVertice v) {
+  caminho->passos[caminho->NumVertices - caminho->TotalPassos - 1] = v;
+  caminho->TotalPassos++;
+}
+
+// Percorre os itens BRANCO do grafo, auxiliando a Busca em Profundidade
+// Complexidade: O(n^2)
+void VisitaDsf(TipoValorVertice u, TipoGrafo *grafo, TipoValorTempo *tempo, TipoValorTempo *d, TipoValorTempo *t, TipoCor *cor, int *antecessor, Caminho *caminho) {
+  bool fimListaAdj;
+  TipoValorAresta peso;
+  Apontador aux;
+  TipoValorVertice v;
+
+  cor[u] = CINZA;
+  (*tempo)++;
+  d[u] = (*tempo);
+
+  printf("Visita %2d Tempo descoberta: %2d cinza\n", u, d[u]);
+
+  if (!ListaAdjVazia(&u, grafo)) {
+    aux = PrimeiroListaAdj(&u, grafo);
+    fimListaAdj = FALSE;
+    while (!fimListaAdj) {
+      ProxAdj(&u, grafo, &v, &peso, &aux, &fimListaAdj);
+
+      if (cor[v] == BRANCO) {
+        antecessor[v] = u;
+        VisitaDsf(v, grafo, tempo, d, t, cor, antecessor, caminho);
+      }
+    }
+  }
+
+  RegistraPasso(caminho, u);
+
+  cor[u] = PRETO;
+  (*tempo)++;
+  t[u] = (*tempo);
+  printf("Visita %2d Tempo Termino: %2d preto\n", u, t[u]);
+}
+
+// Percorre o grafo usando o algoritmo de busca em profundidade.
+// Complexidade: O(2n)
+void BuscaEmProfundidade(TipoGrafo *grafo) {
+  TipoValorVertice x;
+  TipoValorTempo tempo;
+  TipoValorTempo d[MAX_NUM_VERTICES + 1];
+  TipoValorTempo t[MAX_NUM_VERTICES + 1];
+  TipoCor cor[MAX_NUM_VERTICES + 1];
+  int antecessor[MAX_NUM_VERTICES + 1];
+  Caminho caminho;
+
+  tempo = 0;
+  caminho.NumVertices = grafo->NumVertices;
+  caminho.TotalPassos = 0;
+
+  for (x=0; x < grafo->NumVertices; x++) {
+    cor[x] = BRANCO;
+    antecessor[x] = NIL_VALUE;
+  }
+
+  for (x=0; x < grafo->NumVertices; x++) {
+    if (cor[x] == BRANCO) {
+      VisitaDsf(x, grafo, &tempo, d, t, cor, antecessor, &caminho);
+    }
+  }
+
+  for (x=0; x < grafo->NumVertices; x++) {
+    if (x > 0) printf(" -> ");
+    printf("%d", caminho.passos[x]);
+  }
+
+  printf("\n");
+}
+
 void LiberaGrafo(TipoGrafo *grafo) {
   // Não faz nada quando usamos matrizes de adjacencias
 }
@@ -161,7 +254,7 @@ void TestaGrafo() {
   TipoValorVertice nVertices;
   int nArestas;
   bool fimListaAdj;
-
+/*
   printf("No. vertices: "); scanf("%d", &nVertices);
   printf("No. arestas: "); scanf("%d", &nArestas);
 
@@ -184,9 +277,93 @@ void TestaGrafo() {
       i++;
     }
   }
+  */
+
+  nVertices = 8;
+  grafo.NumVertices = nVertices;
+  grafo.NumArestas = VAZIO;
+  FGVazio(&grafo);
+
+  v1 = 0; v2 = 2; peso = 1;
+  InsereAresta(&v1, &v2, &peso, &grafo);
+  InsereAresta(&v2, &v1, &peso, &grafo);
+  grafo.NumArestas++;
+
+  v1 = 0; v2 = 6;
+  InsereAresta(&v1, &v2, &peso, &grafo);
+  InsereAresta(&v2, &v1, &peso, &grafo);
+  grafo.NumArestas++;
+
+  v1 = 0; v2 = 7;
+  InsereAresta(&v1, &v2, &peso, &grafo);
+  InsereAresta(&v2, &v1, &peso, &grafo);
+  grafo.NumArestas++;
+
+  v1 = 2; v2 = 1;
+  InsereAresta(&v1, &v2, &peso, &grafo);
+  InsereAresta(&v2, &v1, &peso, &grafo);
+  grafo.NumArestas++;
+
+  v1 = 2; v2 = 4;
+  InsereAresta(&v1, &v2, &peso, &grafo);
+  InsereAresta(&v2, &v1, &peso, &grafo);
+  grafo.NumArestas++;
+
+  v1 = 2; v2 = 6;
+  InsereAresta(&v1, &v2, &peso, &grafo);
+  InsereAresta(&v2, &v1, &peso, &grafo);
+  grafo.NumArestas++;
+
+  v1 = 1; v2 = 3;
+  InsereAresta(&v1, &v2, &peso, &grafo);
+  InsereAresta(&v2, &v1, &peso, &grafo);
+  grafo.NumArestas++;
+
+  v1 = 1; v2 = 4;
+  InsereAresta(&v1, &v2, &peso, &grafo);
+  InsereAresta(&v2, &v1, &peso, &grafo);
+  grafo.NumArestas++;
+
+  v1 = 1; v2 = 3;
+  InsereAresta(&v1, &v2, &peso, &grafo);
+  InsereAresta(&v2, &v1, &peso, &grafo);
+  grafo.NumArestas++;
+
+  v1 = 3; v2 = 4;
+  InsereAresta(&v1, &v2, &peso, &grafo);
+  InsereAresta(&v2, &v1, &peso, &grafo);
+  grafo.NumArestas++;
+
+  v1 = 3; v2 = 5;
+  InsereAresta(&v1, &v2, &peso, &grafo);
+  InsereAresta(&v2, &v1, &peso, &grafo);
+  grafo.NumArestas++;
+
+  v1 = 4; v2 = 5;
+  InsereAresta(&v1, &v2, &peso, &grafo);
+  InsereAresta(&v2, &v1, &peso, &grafo);
+  grafo.NumArestas++;
+
+  v1 = 5; v2 = 6;
+  InsereAresta(&v1, &v2, &peso, &grafo);
+  InsereAresta(&v2, &v1, &peso, &grafo);
+  grafo.NumArestas++;
+
+  v1 = 5; v2 = 7;
+  InsereAresta(&v1, &v2, &peso, &grafo);
+  InsereAresta(&v2, &v1, &peso, &grafo);
+  grafo.NumArestas++;
+
+  v1 = 6; v2 = 7;
+  InsereAresta(&v1, &v2, &peso, &grafo);
+  InsereAresta(&v2, &v1, &peso, &grafo);
+  grafo.NumArestas++;
 
   ImprimeGrafo(&grafo);
 
+  BuscaEmProfundidade(&grafo);
+
+/*
   printf("Lista adjacentes de: "); scanf("%d", &v1);
 
   if (ListaAdjVazia(&v1, &grafo)) {
@@ -202,4 +379,5 @@ void TestaGrafo() {
 
     printf("\n");
   }
+  */
 }
