@@ -26,6 +26,8 @@ typedef struct TipoGrafo {
 } TipoGrafo;
 
 typedef struct Caminho {
+  // +2 porque deve existir um passo entre a última aresta encontrada e a
+  // primeira.
   TipoValorVertice Passos[MAX_NUM_VERTICES + 2];
   int NumVertices;
   int TotalPassos;
@@ -40,19 +42,24 @@ bool ExisteAresta(TipoValorVertice v1, TipoValorVertice v2, TipoGrafo *grafo);
 bool ListaAdjVazia(TipoValorVertice *vertice, TipoGrafo *grafo);
 Apontador PrimeiroListaAdj(TipoValorVertice *vertice, TipoGrafo *grafo);
 void ProxAdj(TipoValorVertice *vertice, TipoGrafo *grafo, TipoValorVertice *adj, TipoPeso *peso, Apontador *prox, bool *fimListaAdj);
-void RetiraAresta(TipoValorVertice *v1, TipoValorVertice *v2, TipoPeso *peso, TipoGrafo *grafo);
 void VisitaDsf(TipoValorVertice vertice, TipoGrafo *grafo, TipoValorTempo *tempo, TipoValorTempo *d, TipoValorTempo *t, TipoCor *cor, Caminho *caminho);
 Caminho BuscaEmProfundidade(TipoGrafo *grafo);
 void RegistraPasso(Caminho *caminho, TipoValorVertice v);
 void RegistraUltimoPasso(Caminho *caminho, TipoGrafo *grafo);
 void ExibeCaminho(Caminho *caminho);
-void LiberaGrafo(TipoGrafo *grafo);
 void ImprimeGrafo(TipoGrafo *grafo);
 TipoGrafo CriaGrafo();
-void TestaGrafo();
 
 int main() {
-  TestaGrafo();
+  TipoGrafo grafo = CriaGrafo();
+  Caminho caminho = BuscaEmProfundidade(&grafo);
+
+  printf("\nMatriz representando o Grafo: \n");
+  ImprimeGrafo(&grafo);
+
+  printf("\n\nCaminho sugerido ao Caixeiro Viajante: \n");
+  ExibeCaminho(&caminho);
+
   printf("\n\nPCV :)\n");
   return 0;
 }
@@ -136,16 +143,6 @@ void ProxAdj(TipoValorVertice *vertice, TipoGrafo *grafo, TipoValorVertice *adj,
   }
 }
 
-// Retira um aresta do grafo
-// Complexidade: Constante
-void RetiraAresta(TipoValorVertice *v1, TipoValorVertice *v2, TipoPeso *peso, TipoGrafo *grafo) {
-  if (grafo->MatAdj[*v1][*v2] == VAZIO) {
-    printf("Aresta não existe\n");
-  } else {
-    *peso = grafo->MatAdj[*v1][*v2];
-    grafo->MatAdj[*v1][*v2] = VAZIO;
-  }
-}
 // Percorre os itens BRANCO do grafo, auxiliando a Busca em Profundidade
 // Complexidade: O(n^2)
 void VisitaDsf(TipoValorVertice u, TipoGrafo *grafo, TipoValorTempo *tempo, TipoValorTempo *d, TipoValorTempo *t, TipoCor *cor, Caminho *caminho) {
@@ -239,10 +236,6 @@ void ExibeCaminho(Caminho *caminho) {
   }
 }
 
-void LiberaGrafo(TipoGrafo *grafo) {
-  // Não faz nada quando usamos matrizes de adjacencias
-}
-
 void ImprimeGrafo(TipoGrafo *grafo) {
   int i, j;
 
@@ -264,11 +257,10 @@ void ImprimeGrafo(TipoGrafo *grafo) {
 }
 
 TipoGrafo CriaGrafo() {
-  TipoValorVertice v1, v2, adj;
+  TipoValorVertice v1, v2;
   TipoPeso peso;
-  TipoGrafo grafo, grafot;
+  TipoGrafo grafo;
   TipoValorVertice nVertices;
-  int nArestas;
 
   nVertices = 8;
   grafo.NumVertices = nVertices;
@@ -276,90 +268,64 @@ TipoGrafo CriaGrafo() {
   FGVazio(&grafo);
 
   v1 = 0; v2 = 2; peso = 2;
-  InsereAresta(&v1, &v2, &peso, &grafo);
-  InsereAresta(&v2, &v1, &peso, &grafo);
+  InsereAresta(&v1, &v2, &peso, &grafo); InsereAresta(&v2, &v1, &peso, &grafo);
   grafo.NumArestas++;
 
   v1 = 0; v2 = 6; peso = 6;
-  InsereAresta(&v1, &v2, &peso, &grafo);
-  InsereAresta(&v2, &v1, &peso, &grafo);
+  InsereAresta(&v1, &v2, &peso, &grafo); InsereAresta(&v2, &v1, &peso, &grafo);
   grafo.NumArestas++;
 
   v1 = 0; v2 = 7; peso = 7;
-  InsereAresta(&v1, &v2, &peso, &grafo);
-  InsereAresta(&v2, &v1, &peso, &grafo);
+  InsereAresta(&v1, &v2, &peso, &grafo); InsereAresta(&v2, &v1, &peso, &grafo);
   grafo.NumArestas++;
 
   v1 = 2; v2 = 1; peso = 3;
-  InsereAresta(&v1, &v2, &peso, &grafo);
-  InsereAresta(&v2, &v1, &peso, &grafo);
+  InsereAresta(&v1, &v2, &peso, &grafo); InsereAresta(&v2, &v1, &peso, &grafo);
   grafo.NumArestas++;
 
   v1 = 2; v2 = 4; peso = 6;
-  InsereAresta(&v1, &v2, &peso, &grafo);
-  InsereAresta(&v2, &v1, &peso, &grafo);
+  InsereAresta(&v1, &v2, &peso, &grafo); InsereAresta(&v2, &v1, &peso, &grafo);
   grafo.NumArestas++;
 
   v1 = 2; v2 = 6; peso = 8;
-  InsereAresta(&v1, &v2, &peso, &grafo);
-  InsereAresta(&v2, &v1, &peso, &grafo);
+  InsereAresta(&v1, &v2, &peso, &grafo); InsereAresta(&v2, &v1, &peso, &grafo);
   grafo.NumArestas++;
 
   v1 = 1; v2 = 3; peso = 4;
-  InsereAresta(&v1, &v2, &peso, &grafo);
-  InsereAresta(&v2, &v1, &peso, &grafo);
+  InsereAresta(&v1, &v2, &peso, &grafo); InsereAresta(&v2, &v1, &peso, &grafo);
   grafo.NumArestas++;
 
   v1 = 1; v2 = 4; peso = 5;
-  InsereAresta(&v1, &v2, &peso, &grafo);
-  InsereAresta(&v2, &v1, &peso, &grafo);
+  InsereAresta(&v1, &v2, &peso, &grafo); InsereAresta(&v2, &v1, &peso, &grafo);
   grafo.NumArestas++;
 
   v1 = 1; v2 = 3; peso = 4;
-  InsereAresta(&v1, &v2, &peso, &grafo);
-  InsereAresta(&v2, &v1, &peso, &grafo);
+  InsereAresta(&v1, &v2, &peso, &grafo); InsereAresta(&v2, &v1, &peso, &grafo);
   grafo.NumArestas++;
 
   v1 = 3; v2 = 4; peso = 7;
-  InsereAresta(&v1, &v2, &peso, &grafo);
-  InsereAresta(&v2, &v1, &peso, &grafo);
+  InsereAresta(&v1, &v2, &peso, &grafo); InsereAresta(&v2, &v1, &peso, &grafo);
   grafo.NumArestas++;
 
   v1 = 3; v2 = 5; peso = 8;
-  InsereAresta(&v1, &v2, &peso, &grafo);
-  InsereAresta(&v2, &v1, &peso, &grafo);
+  InsereAresta(&v1, &v2, &peso, &grafo); InsereAresta(&v2, &v1, &peso, &grafo);
   grafo.NumArestas++;
 
   v1 = 4; v2 = 5; peso = 9;
-  InsereAresta(&v1, &v2, &peso, &grafo);
-  InsereAresta(&v2, &v1, &peso, &grafo);
+  InsereAresta(&v1, &v2, &peso, &grafo); InsereAresta(&v2, &v1, &peso, &grafo);
   grafo.NumArestas++;
 
   v1 = 5; v2 = 6; peso = 11;
-  InsereAresta(&v1, &v2, &peso, &grafo);
-  InsereAresta(&v2, &v1, &peso, &grafo);
+  InsereAresta(&v1, &v2, &peso, &grafo); InsereAresta(&v2, &v1, &peso, &grafo);
   grafo.NumArestas++;
 
   v1 = 5; v2 = 7; peso = 12;
-  InsereAresta(&v1, &v2, &peso, &grafo);
-  InsereAresta(&v2, &v1, &peso, &grafo);
+  InsereAresta(&v1, &v2, &peso, &grafo); InsereAresta(&v2, &v1, &peso, &grafo);
   grafo.NumArestas++;
 
   v1 = 6; v2 = 7; peso = 13;
-  InsereAresta(&v1, &v2, &peso, &grafo);
-  InsereAresta(&v2, &v1, &peso, &grafo);
+  InsereAresta(&v1, &v2, &peso, &grafo); InsereAresta(&v2, &v1, &peso, &grafo);
   grafo.NumArestas++;
 
   return grafo;
-}
-
-void TestaGrafo() {
-  TipoGrafo grafo = CriaGrafo();
-  Caminho caminho = BuscaEmProfundidade(&grafo);
-
-  printf("\nMatriz representando o Grafo: \n");
-  ImprimeGrafo(&grafo);
-
-  printf("\n\nCaminho sugerido ao Caixeiro Viajante: \n");
-  ExibeCaminho(&caminho);
 }
