@@ -1,9 +1,3 @@
-/*
-FACULDADE DE TECNOLOGIA DE SÃO PAULO - FATEC
-Análise de Algoritmos, Professora Grace Borges
-Tema: Resolver o Problema do Caixeiro Viajante utilizando programação dinâmica
-*/
-
 #include<stdio.h>
 
 #define MAX_NUM_VERTICES  100
@@ -77,7 +71,7 @@ int main() {
 }
 
 // Inicializa todas as posições da matriz de adjacencias com VAZIO.
-// Complexidade: O(n^2)
+// Complexidade: para o grafo G(V,A), o algoritmo tem complexidade O(V^2)
 void FGVazio(TipoGrafo *grafo) {
   int i, j;
   for (i=0; i < grafo->NumVertices; i++) {
@@ -100,7 +94,7 @@ bool ExisteAresta(TipoValorVertice v1, TipoValorVertice v2, TipoGrafo *grafo) {
 }
 
 // Verifica se uma lista de vertices esta vazia
-// Complexidade: O(n)
+// Complexidade: para o grafo G(V,A), o algoritmo tem complexidade O(|V|)
 bool ListaAdjVazia(TipoValorVertice *vertice, TipoGrafo *grafo) {
   Apontador aux = VAZIO;
   bool listaVazia = TRUE;
@@ -117,14 +111,14 @@ bool ListaAdjVazia(TipoValorVertice *vertice, TipoGrafo *grafo) {
 }
 
 // Procura pelo primeiro vertice adjacente em uma lista adjacente
-// Complexidade: O(n)
+// Complexidade: para o grafo G(V,A), o algoritmo tem complexidade O(|V|)
 Apontador PrimeiroListaAdj(TipoValorVertice *vertice, TipoGrafo *grafo) {
   TipoValorVertice primeiro;
-  Apontador aux = VAZIO;
+  Apontador aux = 0;
   bool listaVazia = TRUE;
 
   while (aux < grafo->NumVertices && listaVazia) {
-    if (grafo->MatAdj[*vertice][aux] > 0) {
+    if (grafo->MatAdj[*vertice][aux] > VAZIO) {
       primeiro = aux;
       listaVazia = FALSE;
     } else {
@@ -140,7 +134,7 @@ Apontador PrimeiroListaAdj(TipoValorVertice *vertice, TipoGrafo *grafo) {
 }
 
 // Descobre a próxima posição adjacente
-// Complexidade: O(n)
+// Complexidade: para o grafo G(V,A), o algoritmo tem complexidade O(|V|)
 void ProxAdj(TipoValorVertice *vertice, TipoGrafo *grafo, TipoValorVertice *adj, TipoPeso *peso, Apontador *prox, bool *fimListaAdj) {
   *adj = *prox;
   *peso = grafo->MatAdj[*vertice][*prox];
@@ -156,7 +150,7 @@ void ProxAdj(TipoValorVertice *vertice, TipoGrafo *grafo, TipoValorVertice *adj,
 }
 
 // Percorre os itens BRANCO do grafo, auxiliando a Busca em Profundidade
-// Complexidade: O(n^2)
+// Complexidade: para o grafo G(V,A), o algoritmo tem complexidade O(|V|+|A|)
 void VisitaDsf(TipoValorVertice u, TipoGrafo *grafo, TipoValorTempo *tempo, TipoValorTempo *d, TipoValorTempo *t, TipoCor *cor, Caminho *caminho) {
   bool fimListaAdj;
   TipoValorAresta peso;
@@ -190,7 +184,7 @@ void VisitaDsf(TipoValorVertice u, TipoGrafo *grafo, TipoValorTempo *tempo, Tipo
 }
 
 // Percorre o grafo usando o algoritmo de busca em profundidade.
-// Complexidade: O(2n)
+// Complexidade: para o grafo G(V,A), o algoritmo tem complexidade O(|V|*2)
 Caminho BuscaEmProfundidade(TipoGrafo *grafo) {
   TipoValorVertice x;
   TipoValorTempo tempo;
@@ -242,7 +236,7 @@ void RegistraUltimoPasso(Caminho *caminho, TipoGrafo *grafo) {
 }
 
 // Exibe na tela o caminho que o Caixeiro Viajante deverá percorrer entre os vértices
-// Complexidade: O(n)
+// Complexidade: para o grafo G(V,A), o algoritmo tem complexidade O(|V|)
 void ExibeCaminho(Caminho *caminho, TipoGrafo *grafo) {
   int i;
   bool erro = FALSE;
@@ -261,7 +255,7 @@ void ExibeCaminho(Caminho *caminho, TipoGrafo *grafo) {
 }
 
 // Imprime a matriz de adjancencias
-// Complexidade: O(n^2)
+// Complexidade: para o grafo G(V,A), o algoritmo tem complexidade O(|V|^2+|V|)
 void ImprimeGrafo(TipoGrafo *grafo) {
   int i, j;
 
@@ -282,8 +276,8 @@ void ImprimeGrafo(TipoGrafo *grafo) {
   }
 }
 
-// Gera um grafo para ser trabalhado pelo algoritmo do caixeiro Viajante
-// Complexidade: Constante
+// Gera um grafo para ser trabalhado pelo algoritmo do Caixeiro Viajante
+// Complexidade: Constante para exemplo == 1 / O(|V|^2) para o segundo exemplo
 TipoGrafo CriaGrafo(int exemplo) {
   TipoValorVertice v1, v2;
   TipoPeso peso;
